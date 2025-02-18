@@ -33,18 +33,18 @@ const Applicants = () => {
         console.error("No token found, please log in.");
         return;
       }
-      const response = await axios.patch(
+      const response = await axios.put(
         "http://localhost:3001/job-applications/check",
         {
-          ApplicationId: +applicationId,
+          ApplicationId: applicationId,
           applicationStatus: newStatus,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Pass token in Authorization header
+            "Content-Type": "application/json",
+          },
         }
-        // {
-        //   headers: {
-        //     Authorization: `Bearer ${token}`, // Pass token in Authorization header
-        //     "Content-Type": "application/json",
-        //   },
-        // }
       );
 
       // If the status update is successful, update the local state

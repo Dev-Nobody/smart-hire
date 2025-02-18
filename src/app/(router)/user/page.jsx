@@ -6,6 +6,8 @@ import axios from "axios";
 
 export default function UserDashboard() {
   const router = useRouter();
+  const [pending, setPendings] = useState([]);
+  const [scheduled, setSceduled] = useState([]);
   const [jobs, setJobs] = useState([]);
 
   useEffect(() => {
@@ -19,32 +21,42 @@ export default function UserDashboard() {
         console.error("Error fetching jobs:", error);
       }
     };
+    const fetchPendings = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:3001/job-applications/applicationPending",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`, // Assuming the token is stored in localStorage
+            },
+          }
+        );
+        setPendings(response.data); // Assuming response.data contains the job list
+      } catch (error) {
+        console.error("Error fetching Pendings Applications:", error);
+      }
+    };
 
+    const fetchSceduled = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:3001/job-applications/applicationScheduled",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`, // Assuming the token is stored in localStorage
+            },
+          }
+        );
+        setSceduled(response.data); // Assuming response.data contains the job list
+      } catch (error) {
+        console.error("Error fetching Scedueld Applications:", error);
+      }
+    };
+
+    fetchSceduled();
+    fetchPendings();
     fetchJobs();
   }, []);
-  console.log(jobs, "-------------JOBS");
-
-  // Dummy data for applied jobs
-  // const appliedJobs = [
-  //   {
-  //     key: "1",
-  //     title: "Software Engineer",
-  //     status: "Pending Review",
-  //     date: "2023-12-20",
-  //   },
-  //   {
-  //     key: "2",
-  //     title: "Marketing Specialist",
-  //     status: "Interview Scheduled",
-  //     date: "2023-12-22",
-  //   },
-  //   {
-  //     key: "3",
-  //     title: "Product Manager",
-  //     status: "Rejected",
-  //     date: "2023-12-18",
-  //   },
-  // ];
 
   const columns = [
     {
@@ -113,16 +125,14 @@ export default function UserDashboard() {
           <h2 className="text-sm font-semibold text-gray-700">
             Applications Pending
           </h2>
-          <p className="text-2xl font-bold text-yellow-500">
-            {jobs.filter((job) => job.status === "Pending Review").length}
-          </p>
+          <p className="text-2xl font-bold text-yellow-500">{pending.length}</p>
         </div>
         <div className="bg-white p-4 shadow rounded-lg">
           <h2 className="text-sm font-semibold text-gray-700">
             Interviews Scheduled
           </h2>
           <p className="text-2xl font-bold text-green-500">
-            {jobs.filter((job) => job.status === "Interview Scheduled").length}
+            {scheduled.length}
           </p>
         </div>
       </div>

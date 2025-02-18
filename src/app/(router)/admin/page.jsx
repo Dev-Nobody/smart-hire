@@ -9,13 +9,44 @@ export default function Dashboard() {
 
   const [jobs, setJobs] = useState([]);
   const [applicants, setApplicants] = useState([]);
+  const [pendings, setPendings] = useState([]);
+  const [shortlisted, setShortlisted] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
 
   useEffect(() => {
     fetchJobs();
     fetchApplicants();
+    fetchPendings();
+    fetchShortListed();
   }, []);
+
+  // Fetch Pendings
+  const fetchPendings = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3001/job-applications/pending`
+      );
+      console.log("Fetched Pendings:", response.data); // Log the response data
+
+      setPendings(response.data); // Set applicants data in state
+    } catch (error) {
+      console.error("Error fetching Pendings:", error);
+    }
+  };
+
+  const fetchShortListed = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3001/job-applications/shortlisted`
+      );
+      console.log("Fetched ShortListed:", response.data);
+
+      setShortlisted(response.data);
+    } catch (error) {
+      console.error("Error fetching ShortListed:", error);
+    }
+  };
 
   const fetchJobs = async () => {
     try {
@@ -124,13 +155,17 @@ export default function Dashboard() {
             <h2 className="text-sm font-semibold text-gray-700">
               Pending Reviews
             </h2>
-            <p className="text-2xl font-bold text-yellow-500">8</p>
+            <p className="text-2xl font-bold text-yellow-500">
+              {pendings.length}
+            </p>
           </div>
           <div className="bg-white p-4 shadow rounded-lg">
             <h2 className="text-sm font-semibold text-gray-700">
               Interviews Scheduled
             </h2>
-            <p className="text-2xl font-bold text-purple-500">4</p>
+            <p className="text-2xl font-bold text-purple-500">
+              {shortlisted.length}
+            </p>
           </div>
         </div>
 
