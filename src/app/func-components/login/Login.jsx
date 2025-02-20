@@ -1,12 +1,15 @@
 "use client";
-import React from "react";
+import { React, useState } from "react";
 import axios from "axios";
 import { Form, Input, Button, Checkbox } from "antd";
 import { useRouter } from "next/navigation";
+import { CircularProgress } from "@mui/material";
 
 export default function Login() {
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const onFinish = async (values) => {
+    setLoading(true);
     try {
       const response = await axios.post(
         "http://localhost:3001/auth/signin",
@@ -20,9 +23,11 @@ export default function Login() {
           console.log("Redirecting to admin page...");
           router.push("/admin");
         }
+
         // Redirect to admin page
       }
     } catch (error) {
+      setLoading(false);
       console.error("Login Failed:", error.response?.data || error.message);
     }
   };
@@ -76,7 +81,11 @@ export default function Login() {
 
           <Form.Item>
             <Button type="primary" htmlType="submit" className="w-full">
-              Login
+              {loading ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : (
+                "LOGIN"
+              )}
             </Button>
           </Form.Item>
         </Form>

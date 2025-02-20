@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Table, Button, Modal, Form, Input, message } from "antd";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -12,6 +13,8 @@ export default function Dashboard() {
   const [pendings, setPendings] = useState([]);
   const [shortlisted, setShortlisted] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false); // State to control modal visibility
+  const [jobToDelete, setJobToDelete] = useState(null); // State to store the job to be deleted
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -62,7 +65,7 @@ export default function Dashboard() {
 
   const handleAddJob = async (values) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = Cookies.get("access-token");
       if (!token) {
         message.error("No token found, please log in.");
         return;
@@ -104,6 +107,28 @@ export default function Dashboard() {
     }
   };
 
+  const setJobToDeleteHandler = async () => {
+    try {
+      const response = await axios.delete(
+        `http://localhost:3001/job-management/delete-job/${jobToDelete.id}`
+      );
+      console.log("Job deleted successfully:", response);
+
+      setIsDeleteModalVisible(false);
+      fetchJobs();
+    } catch (error) {
+      console.error("Error deleting job:", error);
+    }
+  };
+
+  const handleCancel = () => {
+    setIsDeleteModalVisible(false);
+  };
+
+  const handleDelete = () => {
+    setJobToDeleteHandler();
+  };
+
   const columns = [
     { title: "Job Title", dataIndex: "title", key: "title" },
     { title: "Department", dataIndex: "category", key: "category" },
@@ -112,18 +137,36 @@ export default function Dashboard() {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Button
-          type="primary"
-          onClick={() => router.push(`/admin/jobs/${record.id}`)}
-        >
-          View Applicants
-        </Button>
+        <div>
+          <Button
+            className="mr-4"
+            type="primary"
+            onClick={() => router.push(`/admin/jobs/${record.id}`)}
+          >
+            View Applicants
+          </Button>
+          <Button
+            type="danger"
+            style={{
+              backgroundColor: "#f44336", // Red color
+              borderColor: "#f44336",
+              color: "white",
+            }}
+            onClick={() => {
+              setJobToDelete(record); // Set the job to delete
+              setIsDeleteModalVisible(true); // Show delete confirmation modal
+            }}
+          >
+            Delete
+          </Button>
+        </div>
       ),
     },
   ];
 
   const logoutSession = () => {
-    localStorage.removeItem("token");
+    // localStorage.removeItem("token");
+    Cookies.remove("access_token");
     router.push("/loginUser");
   };
 
@@ -176,6 +219,26 @@ export default function Dashboard() {
           className="bg-white rounded-lg shadow"
         />
       </div>
+
+      {/* Delete Modal */}
+      <Modal
+        title="Confirm Deletion"
+        visible={isDeleteModalVisible}
+        onCancel={handleCancel}
+        footer={[
+          <Button key="cancel" onClick={handleCancel}>
+            Cancel
+          </Button>,
+          <Button key="delete" type="primary" danger onClick={handleDelete}>
+            Delete
+          </Button>,
+        ]}
+      >
+        <p>
+          Are you sure you want to delete this job? This action cannot be
+          undone.
+        </p>
+      </Modal>
 
       {/* Add Job Modal */}
       <Modal

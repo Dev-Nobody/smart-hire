@@ -1,48 +1,23 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Input, Button, Form, Upload, message } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import { UploadOutlined, UserOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 export default function UserProfile() {
   const router = useRouter();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [profileImage, setProfileImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null); // Store selected file
 
-  const onFinish = (values) => {
-    console.log("Profile updated:", values);
-    message.success("Profile updated successfully!");
-    router.push("/user");
-  };
+  const defaultProfileImage = "https://via.placeholder.com/150?text=Profile";
 
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-    message.error("Please fill all required fields.");
-  };
-
-  const uploadProps = {
-    beforeUpload: (file) => {
-      const isImage = file.type.startsWith("image/");
-      if (!isImage) {
-        message.error("You can only upload image files.");
-      }
-      return isImage || Upload.LIST_IGNORE;
-    },
-    onChange: (info) => {
-      if (info.file.status === "uploading") {
-        setLoading(true);
-      } else if (info.file.status === "done" || info.file.status === "error") {
-        setLoading(false);
-        message.success(`${info.file.name} uploaded successfully.`);
-      }
-    },
-  };
-
-  const fetchUserProfile = async (form) => {
+  const fetchUserProfile = async () => {
     try {
-      const token = localStorage.getItem("token");
-
+      const token = Cookies.get("access_token");
       if (!token) {
         message.error("No token found, please log in.");
         return;
@@ -54,16 +29,18 @@ export default function UserProfile() {
           "Content-Type": "application/json",
         },
       });
+
       const user = response.data;
-      console.log("Current User Data:", user);
+      console.log("User Data:", user);
 
       if (user) {
-        // Set form fields with fetched user data
         form.setFieldsValue({
-          name: user.name || "User",
+          name: user.username || "User",
           email: user.email || "",
-          phone: user.phone || "0000",
+          phone: user.phoneNumber || "0000",
         });
+
+        setProfileImage(user.profileImage || defaultProfileImage);
       } else {
         message.error("No user data found.");
       }
@@ -74,13 +51,80 @@ export default function UserProfile() {
   };
 
   useEffect(() => {
-    fetchUserProfile(form);
-  }, [form]);
+    fetchUserProfile();
+  }, []);
+
+  // Handle Image Change (Only Updates Preview)
+  const handleUpload = async ({ file }) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      setProfileImage(reader.result); // Show preview
+      setSelectedImage(file); // Save selected file for later upload
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Handle Profile Update
+  const onFinish = async (values) => {
+    try {
+      setLoading(true);
+      // const token = localStorage.getItem("token");
+
+      const formData = new FormData();
+      formData.append("username", values.name);
+      formData.append("email", values.email);
+      formData.append("phoneNumber", values.phone);
+      if (selectedImage) {
+        formData.append("img", selectedImage); // Upload image if changed
+      }
+
+      await axios.put("http://localhost:3001/user/update-profile", formData, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("access_token")}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      message.success("Profile updated successfully!");
+      setSelectedImage(null); // Clear selected image after upload
+      router.push("/user");
+    } catch (error) {
+      console.error("Update error:", error);
+      message.error("Failed to update profile.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onFinishFailed = (errorInfo) => {
+    console.log("Failed:", errorInfo);
+    message.error("Please fill all required fields.");
+  };
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+    <div className="p-6 bg-gray-100 min-h-screen flex flex-col items-center">
       <h1 className="text-2xl font-bold text-blue-600 mb-6">User Profile</h1>
-      <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg mx-auto">
+
+      {/* Profile Image Section */}
+      <div className="relative mb-6">
+        <img
+          src={profileImage || defaultProfileImage}
+          alt="Profile"
+          className="w-44 h-44 rounded-full border-4 border-gray-300 shadow-lg object-cover"
+        />
+        <Upload customRequest={handleUpload} showUploadList={false}>
+          <Button
+            icon={<UploadOutlined />}
+            loading={loading}
+            className="absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-white border border-gray-300 rounded-full px-3 py-1 shadow-md"
+          >
+            Change
+          </Button>
+        </Upload>
+      </div>
+
+      {/* Form Section */}
+      <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
         <Form
           form={form}
           name="profile"
@@ -124,19 +168,12 @@ export default function UserProfile() {
             <Input />
           </Form.Item>
 
-          <Form.Item label="Profile Picture">
-            <Upload {...uploadProps}>
-              <Button icon={<UploadOutlined />} loading={loading}>
-                Upload Profile Picture
-              </Button>
-            </Upload>
-          </Form.Item>
-
           <Form.Item>
             <Button
               type="primary"
               htmlType="submit"
               className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2"
+              loading={loading}
             >
               Update Profile
             </Button>

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Table, Button } from "antd";
 import { useRouter, useParams } from "next/navigation";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const Applicants = () => {
   const router = useRouter();
@@ -28,7 +29,7 @@ const Applicants = () => {
   // Update application status function
   const updateApplicantsStatus = async (applicationId, newStatus) => {
     try {
-      const token = localStorage.getItem("token"); // Retrieve token from localStorage
+      const token = Cookies.get("access_token");
       if (!token) {
         console.error("No token found, please log in.");
         return;
@@ -41,7 +42,7 @@ const Applicants = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Pass token in Authorization header
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -68,13 +69,13 @@ const Applicants = () => {
   // Table columns
   const columns = [
     {
-      title: "Name",
-      dataIndex: "name",
+      title: "Job Title",
+      dataIndex: ["job", "title"],
       key: "name",
     },
     {
       title: "Email",
-      dataIndex: "userId",
+      dataIndex: ["user", "email"],
       key: "email",
     },
     {

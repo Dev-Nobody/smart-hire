@@ -1,8 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { Button } from "antd";
+import { Button, message } from "antd";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export default function JobDetails() {
   const { id } = useParams();
@@ -11,27 +12,27 @@ export default function JobDetails() {
 
   const ApplyForJob = async () => {
     try {
-      const token = localStorage.getItem("token"); // Retrieve token from localStorage
+      const token = Cookies.get("access_token");
       if (!token) {
-        console.error("No token found, please log in.");
+        message.error("No token found, please log in.");
         return;
       }
 
-      console.log(typeof id);
       const response = await axios.post(
         "http://localhost:3001/job-applications/apply",
-        { jobId: +id }, // Correct payload format
+        { jobId: +id },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Pass token in Authorization header
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
       );
 
-      router.push("/user"); // Redirect on success
+      router.push("/user");
     } catch (error) {
       console.error("Error While Applying:", error);
+      alert(error);
     }
   };
 
@@ -69,9 +70,9 @@ export default function JobDetails() {
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-2xl mx-auto">
         <h1 className="text-3xl font-bold text-blue-600">{job.title}</h1>
         <p className="text-gray-500 mt-2">{job.department}</p>
-        <p className="mt-4 text-gray-700">{job.description}</p>
-        <h2 className="text-xl font-bold mt-6">Requirements</h2>
-        <ul className="list-disc list-inside mt-2">
+        <p className="mt-4 text-gray-500">{job.description}</p>
+        <h2 className="text-blue-600 text-xl font-bold mt-6 ">Requirements</h2>
+        <ul className=" text-gray-500 list-disc list-inside mt-2">
           <li>{job.requirements}</li>
         </ul>
         <div className="mt-6 flex justify-end">

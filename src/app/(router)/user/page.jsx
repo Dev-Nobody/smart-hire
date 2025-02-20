@@ -3,11 +3,13 @@ import React, { useEffect, useState } from "react";
 import { Table, Button } from "antd";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export default function UserDashboard() {
   const router = useRouter();
   const [pending, setPendings] = useState([]);
   const [scheduled, setSceduled] = useState([]);
+  const [appliedList, setAppliedList] = useState([]);
   const [jobs, setJobs] = useState([]);
 
   useEffect(() => {
@@ -23,11 +25,16 @@ export default function UserDashboard() {
     };
     const fetchPendings = async () => {
       try {
+        const token = Cookies.get("access_token");
+        if (!token) {
+          message.error("No token found, please log in.");
+          return;
+        }
         const response = await axios.get(
           "http://localhost:3001/job-applications/applicationPending",
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`, // Assuming the token is stored in localStorage
+              Authorization: `Bearer ${token}`,
             },
           }
         );
@@ -39,20 +46,47 @@ export default function UserDashboard() {
 
     const fetchSceduled = async () => {
       try {
+        const token = Cookies.get("access_token");
+        if (!token) {
+          message.error("No token found, please log in.");
+          return;
+        }
         const response = await axios.get(
           "http://localhost:3001/job-applications/applicationScheduled",
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`, // Assuming the token is stored in localStorage
+              Authorization: `Bearer ${token}`,
             },
           }
         );
-        setSceduled(response.data); // Assuming response.data contains the job list
+        setSceduled(response.data);
       } catch (error) {
         console.error("Error fetching Scedueld Applications:", error);
       }
     };
 
+    const fetchAppliedList = async () => {
+      try {
+        const token = Cookies.get("access_token");
+        if (!token) {
+          message.error("No token found, please log in.");
+          return;
+        }
+        const response = await axios.get(
+          "http://localhost:3001/job-applications/appliedJobs",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        ); // Your API endpoint here
+        setAppliedList(response.data); // Assuming response.data contains the job list
+      } catch (error) {
+        console.error("Error fetching Applied List:", error);
+      }
+    };
+
+    fetchAppliedList();
     fetchSceduled();
     fetchPendings();
     fetchJobs();
@@ -74,11 +108,7 @@ export default function UserDashboard() {
       dataIndex: "category",
       key: "category",
     },
-    // {
-    //   title: "Applied Date",
-    //   dataIndex: "date",
-    //   key: "date",
-    // },
+
     {
       title: "Action",
       key: "action",
@@ -97,11 +127,15 @@ export default function UserDashboard() {
 
   const LogoutSession = () => {
     localStorage.removeItem("token");
-    router.push("/login");
+    Cookies.remove("access_token");
+    router.push("/loginUser");
   };
 
   const myProfile = () => {
     router.push("/user/profile");
+  };
+  const appliedJobs = () => {
+    router.push("/user/applied");
   };
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -114,7 +148,7 @@ export default function UserDashboard() {
           <Button onClick={myProfile}>My Profile</Button>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div className="bg-white p-4 shadow rounded-lg">
           <h2 className="text-sm font-semibold text-gray-700">
             Total Applications
@@ -133,6 +167,19 @@ export default function UserDashboard() {
           </h2>
           <p className="text-2xl font-bold text-green-500">
             {scheduled.length}
+          </p>
+        </div>
+        <div
+          className="bg-white p-4 shadow rounded-lg cursor-pointer hover:bg-gray-200 transition duration-300"
+          onClick={() => {
+            appliedJobs();
+          }}
+        >
+          <h2 className="text-sm font-semibold text-gray-700">
+            Applied Applications
+          </h2>
+          <p className="text-2xl font-bold text-blue-500">
+            {appliedList.length}
           </p>
         </div>
       </div>

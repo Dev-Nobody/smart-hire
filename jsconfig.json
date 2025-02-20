@@ -3,5 +3,7 @@
     "paths": {
       "@/*": ["./src/*"]
     }
-  }
+  },
+  "include": ["src/**/*", "**/*.js", "src/app/middleware.jsare.js"],
+  "exclude": ["node_modules"]
 }
