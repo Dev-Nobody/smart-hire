@@ -137,6 +137,14 @@ export default function UserDashboard() {
   const appliedJobs = () => {
     router.push("/user/applied");
   };
+
+  const pendingApplications = () => {
+    router.push("/user/pending");
+  };
+
+  const interviewScheduled = () => {
+    router.push("/user/scheduled");
+  };
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <div className="flex justify-between">
@@ -148,20 +156,30 @@ export default function UserDashboard() {
           <Button onClick={myProfile}>My Profile</Button>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <div className="bg-white p-4 shadow rounded-lg">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        {/* <div className="bg-white p-4 shadow rounded-lg">
           <h2 className="text-sm font-semibold text-gray-700">
             Total Applications
           </h2>
           <p className="text-2xl font-bold text-blue-500">{jobs.length}</p>
-        </div>
-        <div className="bg-white p-4 shadow rounded-lg">
+        </div> */}
+        <div
+          className="bg-white p-4 shadow rounded-lg cursor-pointer hover:bg-gray-200 transition duration-300"
+          onClick={() => {
+            pendingApplications();
+          }}
+        >
           <h2 className="text-sm font-semibold text-gray-700">
             Applications Pending
           </h2>
           <p className="text-2xl font-bold text-yellow-500">{pending.length}</p>
         </div>
-        <div className="bg-white p-4 shadow rounded-lg">
+        <div
+          className="bg-white p-4 shadow rounded-lg cursor-pointer hover:bg-gray-200 transition duration-300"
+          onClick={() => {
+            interviewScheduled();
+          }}
+        >
           <h2 className="text-sm font-semibold text-gray-700">
             Interviews Scheduled
           </h2>

@@ -9,7 +9,7 @@ export default function Home() {
       <p className="text-lg mt-4 text-gray-600">
         Simplifying the hiring process for companies and job seekers.
       </p>
-      <Link href="/login" legacyBehavior>
+      <Link href="/loginUser" legacyBehavior>
         <a className="mt-6 px-6 py-3 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600">
           Get Started
         </a>

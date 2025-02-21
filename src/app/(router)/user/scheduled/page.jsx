@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import Cookies from "js-cookie";
 
-export default function AppliedApplications() {
+export default function InterviewScheduled() {
   const router = useRouter();
-  const [appliedJobs, setAppliedJobs] = useState([]);
-  const [applicationStatusList, setApplicationStatusList] = useState([]);
+  const [scheduledInterviews, setScheduledInterviews] = useState([]);
+  const [interviewStatus, setInterviewStatus] = useState([]);
 
   useEffect(() => {
-    const fetchAppliedJobs = async () => {
+    const fetchScheduledInterviews = async () => {
       try {
         const token = Cookies.get("access_token");
         if (!token) {
@@ -19,19 +19,19 @@ export default function AppliedApplications() {
           return;
         }
         const response = await axios.get(
-          "http://localhost:3001/job-applications/appliedJobs",
+          "http://localhost:3001/job-applications/applicationScheduled",
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        setAppliedJobs(response.data);
+        setScheduledInterviews(response.data);
       } catch (error) {
-        console.error("Error fetching applied jobs:", error);
+        console.error("Error fetching scheduled interviews:", error);
       }
     };
-    fetchAppliedJobs();
+    fetchScheduledInterviews();
   }, []);
 
   const columns = [
@@ -87,16 +87,16 @@ export default function AppliedApplications() {
     <div className="p-6 bg-gray-100 min-h-screen">
       <div className="flex justify-between">
         <h1 className="text-2xl font-bold text-blue-600 mb-6">
-          Applied Applications
+          Scheduled Interviews
         </h1>
         <div>
-          <Button onClick={goToHome}>Return To Home</Button>
+          <Button onClick={goToHome}>Return To Home </Button>
         </div>
       </div>
 
       <Table
         columns={columns}
-        dataSource={appliedJobs}
+        dataSource={scheduledInterviews}
         pagination={{ pageSize: 5 }}
         className="bg-white rounded-lg shadow"
       />

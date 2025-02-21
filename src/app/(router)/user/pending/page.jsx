@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import Cookies from "js-cookie";
 
-export default function AppliedApplications() {
+export default function pendingApplications() {
   const router = useRouter();
-  const [appliedJobs, setAppliedJobs] = useState([]);
-  const [applicationStatusList, setApplicationStatusList] = useState([]);
+  const [pendingList, setPendingList] = useState([]);
+  const [pendingStatus, setPendingStatus] = useState([]);
 
   useEffect(() => {
-    const fetchAppliedJobs = async () => {
+    const fetchPendingList = async () => {
       try {
         const token = Cookies.get("access_token");
         if (!token) {
@@ -19,21 +19,22 @@ export default function AppliedApplications() {
           return;
         }
         const response = await axios.get(
-          "http://localhost:3001/job-applications/appliedJobs",
+          "http://localhost:3001/job-applications/applicationPending",
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        setAppliedJobs(response.data);
+        setPendingList(response.data);
+        console.log(pendingList, "listtttttttt");
       } catch (error) {
-        console.error("Error fetching applied jobs:", error);
+        console.error("Error fetching Pending List:", error);
       }
     };
-    fetchAppliedJobs();
+    fetchPendingList();
+    console.log(pendingList, "listtttttttt");
   }, []);
-
   const columns = [
     {
       title: "Job Title",
@@ -63,6 +64,7 @@ export default function AppliedApplications() {
         </span>
       ),
     },
+
     {
       title: "Action",
       key: "action",
@@ -70,7 +72,10 @@ export default function AppliedApplications() {
         return (
           <Button
             type="link"
-            onClick={() => router.push(`/user/jobs/${record.job.id}`)}
+            onClick={() => {
+              console.log({ Recordsssssssss: record.job.id });
+              router.push(`/user/jobs/${record.job.id}`);
+            }}
           >
             View Details
           </Button>
@@ -79,7 +84,7 @@ export default function AppliedApplications() {
     },
   ];
 
-  const goToHome = () => {
+  const BackToHome = () => {
     router.push("/user");
   };
 
@@ -87,16 +92,16 @@ export default function AppliedApplications() {
     <div className="p-6 bg-gray-100 min-h-screen">
       <div className="flex justify-between">
         <h1 className="text-2xl font-bold text-blue-600 mb-6">
-          Applied Applications
+          Pending Applications
         </h1>
         <div>
-          <Button onClick={goToHome}>Return To Home</Button>
+          <Button onClick={BackToHome}>Return To Home </Button>
         </div>
       </div>
 
       <Table
         columns={columns}
-        dataSource={appliedJobs}
+        dataSource={pendingList}
         pagination={{ pageSize: 5 }}
         className="bg-white rounded-lg shadow"
       />

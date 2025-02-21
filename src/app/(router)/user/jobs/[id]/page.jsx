@@ -9,6 +9,7 @@ export default function JobDetails() {
   const { id } = useParams();
   const router = useRouter();
   const [jobDetails, setJobDetails] = useState(null);
+  const [applyDetails, setApplyDetails] = useState(null);
 
   const ApplyForJob = async () => {
     try {
@@ -37,8 +38,38 @@ export default function JobDetails() {
   };
 
   useEffect(() => {
+    const appliedCheck = async () => {
+      try {
+        const token = Cookies.get("access_token"); // Fix: Add token retrieval
+        if (!token) {
+          message.error("No token found, please log in.");
+          return;
+        }
+
+        const response = await axios.get(
+          `http://localhost:3001/job-applications/appliedCheck/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        console.log("Job Applied:", response.data);
+        setApplyDetails(response.data);
+      } catch (error) {
+        console.error("Error fetching Applied details:", error);
+      }
+    };
+
     const fetchJobDetails = async () => {
       try {
+        const token = Cookies.get("access_token");
+        if (!token) {
+          message.error("No token found, please log in.");
+          return;
+        }
+
         const response = await axios.get(
           `http://localhost:3001/job-management/search/${id}`
         );
@@ -49,6 +80,7 @@ export default function JobDetails() {
       }
     };
 
+    appliedCheck();
     fetchJobDetails();
   }, []);
 
@@ -79,13 +111,15 @@ export default function JobDetails() {
           <Button
             type="primary"
             onClick={() => ApplyForJob()}
+            disabled={applyDetails !== null} // Prevents multiple applications
             className="bg-blue-500 mr-3 hover:bg-blue-600 text-white font-semibold rounded-md"
           >
-            Apply
+            {applyDetails ? "Already Applied" : "Apply"}
           </Button>
+
           <Button
             type="primary"
-            onClick={() => router.back()}
+            onClick={() => router.push("/user")}
             className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md"
           >
             Back to Dashboard
