@@ -73,7 +73,6 @@ export default function pendingApplications() {
           <Button
             type="link"
             onClick={() => {
-              console.log({ Recordsssssssss: record.job.id });
               router.push(`/user/jobs/${record.job.id}`);
             }}
           >

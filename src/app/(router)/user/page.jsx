@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Table, Button } from "antd";
+import { Table, Button, Modal, Input, message } from "antd";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -11,14 +11,68 @@ export default function UserDashboard() {
   const [scheduled, setSceduled] = useState([]);
   const [appliedList, setAppliedList] = useState([]);
   const [jobs, setJobs] = useState([]);
+  const [isVerified, setIsVerified] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [token, setToken] = useState("");
 
+  const verifyOtp = async () => {
+    if (!token) {
+      message.error("Please enter the verification code!");
+      return;
+    }
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/auth/verify-email",
+        {
+          email,
+          otp: token,
+        }
+      );
+
+      message.success("Email verified successfully!");
+      setIsModalOpen(false);
+    } catch (error) {
+      message.error(error.response?.data?.message || "Verification failed!");
+    }
+  };
+
+  const resendOtp = async () => {
+    try {
+      await axios.post("http://localhost:3001/auth/resend-otp", { email });
+      message.success("Verification code resent successfully!");
+    } catch (error) {
+      message.error(error.response?.data?.message || "Failed to resend code!");
+    }
+  };
   useEffect(() => {
+    const checkVerification = async () => {
+      // Renamed function
+      try {
+        const token = Cookies.get("access_token");
+        if (!token) {
+          message.error("No token found, please log in.");
+          return;
+        }
+
+        const response = await axios.get("http://localhost:3001/user/get-me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setIsVerified(response.data.isVerified); // Ensure correct access to response data
+        setEmail(response.data.email);
+      } catch (error) {
+        console.error("Error fetching verification status:", error);
+      }
+    };
+
     const fetchJobs = async () => {
       try {
         const response = await axios.get(
           "http://localhost:3001/job-management/get-list"
-        ); // Your API endpoint here
-        setJobs(response.data); // Assuming response.data contains the job list
+        );
+        setJobs(response.data);
       } catch (error) {
         console.error("Error fetching jobs:", error);
       }
@@ -85,7 +139,7 @@ export default function UserDashboard() {
         console.error("Error fetching Applied List:", error);
       }
     };
-
+    checkVerification();
     fetchAppliedList();
     fetchSceduled();
     fetchPendings();
@@ -130,7 +184,9 @@ export default function UserDashboard() {
     Cookies.remove("access_token");
     router.push("/loginUser");
   };
-
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
   const myProfile = () => {
     router.push("/user/profile");
   };
@@ -152,6 +208,12 @@ export default function UserDashboard() {
           User Dashboard
         </h1>
         <div>
+          {!isVerified && (
+            <Button onClick={openModal} type="primary" danger>
+              Not Verified
+            </Button>
+          )}
+
           <Button onClick={LogoutSession}>Logout</Button>
           <Button onClick={myProfile}>My Profile</Button>
         </div>
@@ -207,6 +269,30 @@ export default function UserDashboard() {
         pagination={{ pageSize: 5 }}
         className="bg-white rounded-lg shadow"
       />
+      {/* Email Verification Modal */}
+      <Modal
+        title="Verify Your Email"
+        open={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        footer={null}
+      >
+        <p>Enter the verification code sent to {email}.</p>
+        <Input
+          placeholder="Enter verification code"
+          value={token}
+          onChange={(e) => setToken(e.target.value)}
+          className="mb-3"
+        />
+        <div className="flex justify-end space-x-2">
+          <Button onClick={() => setIsModalOpen(false)}>Close</Button>
+          <Button type="default" onClick={resendOtp}>
+            Resend Code
+          </Button>
+          <Button type="primary" onClick={verifyOtp}>
+            Verify
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }

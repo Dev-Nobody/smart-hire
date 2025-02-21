@@ -72,7 +72,6 @@ export default function Login() {
           >
             <Input />
           </Form.Item>
-
           <Form.Item
             label="Password"
             name="password"
@@ -80,22 +79,33 @@ export default function Login() {
           >
             <Input.Password />
           </Form.Item>
-
-          <Form.Item name="remember" valuePropName="checked">
-            <Checkbox>Remember me</Checkbox>
-          </Form.Item>
-
+          <div className="flex justify-between items-center mb-4">
+            <Form.Item name="remember" valuePropName="checked" noStyle>
+              <Checkbox>Remember me</Checkbox>
+            </Form.Item>
+            <span
+              className="text-blue-600 cursor-pointer hover:underline"
+              onClick={() => router.push("/forgotPassword")}
+            >
+              Forgot Password?
+            </span>
+          </div>
           <Form.Item>
             <Button type="primary" htmlType="submit" className="w-full">
               Login
             </Button>
-          </Form.Item>
-
-          <Form.Item>
-            <p onClick={() => router.push("/register")}>
-              Don't Have an Account? Click Here
-            </p>
-          </Form.Item>
+          </Form.Item>{" "}
+          <div className="text-center mt-4">
+            <span className="text-black w-1">
+              Don't have an account?
+              <span
+                className="text-blue-600 cursor-pointer hover:underline ml-1"
+                onClick={() => router.push("/register")}
+              >
+                Sign up here
+              </span>
+            </span>
+          </div>
         </Form>
       </div>
     </div>
