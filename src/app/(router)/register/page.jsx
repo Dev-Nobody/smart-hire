@@ -14,7 +14,7 @@ export default function Register() {
     try {
       setIsModalOpen(true);
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_UR}/auth/signup`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/auth/signup`,
         {
           ...values,
           role: "user",
@@ -38,7 +38,7 @@ export default function Register() {
     }
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_UR}/auth/verify-email`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/auth/verify-email`,
         {
           email,
           otp: token,
@@ -55,7 +55,7 @@ export default function Register() {
 
   const resendOtp = async () => {
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_BASE_UR}/auth/resend-otp`, {
+      await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/resend-otp`, {
         email,
       });
       message.success("Verification code resent successfully!");

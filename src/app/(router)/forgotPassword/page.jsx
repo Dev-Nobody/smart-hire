@@ -14,7 +14,7 @@ export default function ForgetPassword() {
   const handleResetPassword = async () => {
     try {
       // API call to request OTP
-      await axios.post(`${process.env.NEXT_PUBLIC_BASE_UR}/auth/reset-ps`, {
+      await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/reset-ps`, {
         email,
       });
       setIsModalVisible(true);
@@ -29,7 +29,7 @@ export default function ForgetPassword() {
   const handleResendOtp = async () => {
     try {
       // API call to resend OTP
-      await axios.post(`${process.env.NEXT_PUBLIC_BASE_UR}/auth/resend-otp`, {
+      await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/resend-otp`, {
         email,
       });
     } catch (error) {
@@ -43,11 +43,14 @@ export default function ForgetPassword() {
   const handleReset = async () => {
     try {
       // API call to verify OTP and reset password
-      await axios.post(`${process.env.NEXT_PUBLIC_BASE_UR}/auth/reset-ps-otp`, {
-        email,
-        otp,
-        newPass: newPassword, // Send new password
-      });
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/auth/reset-ps-otp`,
+        {
+          email,
+          otp,
+          newPass: newPassword, // Send new password
+        }
+      );
       setIsModalVisible(false);
       router.push("/loginUser"); // Redirect to login after reset
     } catch (error) {

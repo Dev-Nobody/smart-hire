@@ -16,7 +16,7 @@ const Applicants = () => {
     console.log("Entered");
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_UR}/job-applications/search/${+id}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/job-applications/search/${+id}`
       );
       console.log("Fetched Applicants:", response.data); // Log the response data
 
@@ -35,7 +35,7 @@ const Applicants = () => {
         return;
       }
       const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_BASE_UR}/job-applications/check`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/job-applications/check`,
         {
           ApplicationId: applicationId,
           applicationStatus: newStatus,
