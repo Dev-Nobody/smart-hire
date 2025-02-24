@@ -23,7 +23,7 @@ export default function UserDashboard() {
     }
     try {
       const response = await axios.post(
-        "http://localhost:3001/auth/verify-email",
+        `${process.env.NEXT_PUBLIC_BASE_UR}/auth/verify-email`,
         {
           email,
           otp: token,
@@ -39,7 +39,9 @@ export default function UserDashboard() {
 
   const resendOtp = async () => {
     try {
-      await axios.post("http://localhost:3001/auth/resend-otp", { email });
+      await axios.post(`${process.env.NEXT_PUBLIC_BASE_UR}/auth/resend-otp`, {
+        email,
+      });
       message.success("Verification code resent successfully!");
     } catch (error) {
       message.error(error.response?.data?.message || "Failed to resend code!");
@@ -55,11 +57,14 @@ export default function UserDashboard() {
           return;
         }
 
-        const response = await axios.get("http://localhost:3001/user/get-me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_UR}/user/get-me`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setIsVerified(response.data.isVerified); // Ensure correct access to response data
         setEmail(response.data.email);
       } catch (error) {
@@ -70,7 +75,7 @@ export default function UserDashboard() {
     const fetchJobs = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3001/job-management/get-list"
+          `${process.env.NEXT_PUBLIC_BASE_UR}/job-management/get-list`
         );
         setJobs(response.data);
       } catch (error) {
@@ -85,7 +90,7 @@ export default function UserDashboard() {
           return;
         }
         const response = await axios.get(
-          "http://localhost:3001/job-applications/applicationPending",
+          `${process.env.NEXT_PUBLIC_BASE_UR}/job-applications/applicationPending`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -106,7 +111,7 @@ export default function UserDashboard() {
           return;
         }
         const response = await axios.get(
-          "http://localhost:3001/job-applications/applicationScheduled",
+          `${process.env.NEXT_PUBLIC_BASE_UR}/job-applications/applicationScheduled`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -127,7 +132,7 @@ export default function UserDashboard() {
           return;
         }
         const response = await axios.get(
-          "http://localhost:3001/job-applications/appliedJobs",
+          `${process.env.NEXT_PUBLIC_BASE_UR}/job-applications/appliedJobs`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

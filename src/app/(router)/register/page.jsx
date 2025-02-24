@@ -13,10 +13,13 @@ export default function Register() {
   const onFinish = async (values) => {
     try {
       setIsModalOpen(true);
-      const response = await axios.post("http://localhost:3001/auth/signup", {
-        ...values,
-        role: "user",
-      });
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_UR}/auth/signup`,
+        {
+          ...values,
+          role: "user",
+        }
+      );
       if (response.status === 201) {
         console.log("Register Successful:", response.data);
         message.success("Profile created successfully!");
@@ -35,7 +38,7 @@ export default function Register() {
     }
     try {
       const response = await axios.post(
-        "http://localhost:3001/auth/verify-email",
+        `${process.env.NEXT_PUBLIC_BASE_UR}/auth/verify-email`,
         {
           email,
           otp: token,
@@ -52,7 +55,9 @@ export default function Register() {
 
   const resendOtp = async () => {
     try {
-      await axios.post("http://localhost:3001/auth/resend-otp", { email });
+      await axios.post(`${process.env.NEXT_PUBLIC_BASE_UR}/auth/resend-otp`, {
+        email,
+      });
       message.success("Verification code resent successfully!");
     } catch (error) {
       message.error(error.response?.data?.message || "Failed to resend code!");

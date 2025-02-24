@@ -23,12 +23,15 @@ export default function UserProfile() {
         return;
       }
 
-      const response = await axios.get("http://localhost:3001/user/get-me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/user/get-me`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       const user = response.data;
       console.log("User Data:", user);
@@ -78,12 +81,16 @@ export default function UserProfile() {
         formData.append("img", selectedImage); // Upload image if changed
       }
 
-      await axios.put("http://localhost:3001/user/update-profile", formData, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get("access_token")}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/user/update-profile`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("access_token")}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       message.success("Profile updated successfully!");
       setSelectedImage(null); // Clear selected image after upload

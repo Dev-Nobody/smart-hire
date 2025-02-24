@@ -19,7 +19,7 @@ export default function AppliedApplications() {
           return;
         }
         const response = await axios.get(
-          "http://localhost:3001/job-applications/appliedJobs",
+          `${process.env.NEXT_PUBLIC_BASE_URL}/job-applications/appliedJobs`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

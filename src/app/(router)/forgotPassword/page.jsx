@@ -14,7 +14,9 @@ export default function ForgetPassword() {
   const handleResetPassword = async () => {
     try {
       // API call to request OTP
-      await axios.post("http://localhost:3001/auth/reset-ps", { email });
+      await axios.post(`${process.env.NEXT_PUBLIC_BASE_UR}/auth/reset-ps`, {
+        email,
+      });
       setIsModalVisible(true);
     } catch (error) {
       console.error(
@@ -27,7 +29,9 @@ export default function ForgetPassword() {
   const handleResendOtp = async () => {
     try {
       // API call to resend OTP
-      await axios.post("http://localhost:3001/auth/resend-otp", { email });
+      await axios.post(`${process.env.NEXT_PUBLIC_BASE_UR}/auth/resend-otp`, {
+        email,
+      });
     } catch (error) {
       console.error(
         "Error resending OTP:",
@@ -39,7 +43,7 @@ export default function ForgetPassword() {
   const handleReset = async () => {
     try {
       // API call to verify OTP and reset password
-      await axios.post("http://localhost:3001/auth/reset-ps-otp", {
+      await axios.post(`${process.env.NEXT_PUBLIC_BASE_UR}/auth/reset-ps-otp`, {
         email,
         otp,
         newPass: newPassword, // Send new password

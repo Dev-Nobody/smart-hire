@@ -28,7 +28,7 @@ export default function Dashboard() {
   const fetchPendings = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3001/job-applications/pending`
+        `${process.env.NEXT_PUBLIC_BASE_UR}/job-applications/pending`
       );
       console.log("Fetched Pendings:", response.data); // Log the response data
 
@@ -41,7 +41,7 @@ export default function Dashboard() {
   const fetchShortListed = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3001/job-applications/shortlisted`
+        `${process.env.NEXT_PUBLIC_BASE_UR}/job-applications/shortlisted`
       );
       console.log("Fetched ShortListed:", response.data);
 
@@ -54,7 +54,7 @@ export default function Dashboard() {
   const fetchJobs = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3001/job-management/get-list"
+        `${process.env.NEXT_PUBLIC_BASE_UR}/job-management/get-list`
       );
       setJobs(response.data);
     } catch (error) {
@@ -72,7 +72,7 @@ export default function Dashboard() {
       }
 
       await axios.post(
-        "http://localhost:3001/job-management/create",
+        `${process.env.NEXT_PUBLIC_BASE_UR}/job-management/create`,
         {
           ...values,
           salaryMin: Number(values.salaryMin),
@@ -97,7 +97,7 @@ export default function Dashboard() {
     try {
       // Fetch job applications list
       const response = await axios.get(
-        "http://localhost:3001/job-applications/getApplicants"
+        `${process.env.NEXT_PUBLIC_BASE_UR}/job-applications/getApplicants`
       );
 
       setApplicants(response.data.length);
@@ -110,7 +110,7 @@ export default function Dashboard() {
   const setJobToDeleteHandler = async () => {
     try {
       const response = await axios.delete(
-        `http://localhost:3001/job-management/delete-job/${jobToDelete.id}`
+        `${process.env.NEXT_PUBLIC_BASE_UR}/job-management/delete-job/${jobToDelete.id}`
       );
       console.log("Job deleted successfully:", response);
 

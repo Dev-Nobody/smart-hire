@@ -19,7 +19,7 @@ export default function pendingApplications() {
           return;
         }
         const response = await axios.get(
-          "http://localhost:3001/job-applications/applicationPending",
+          `${process.env.NEXT_PUBLIC_BASE_URL}/job-applications/applicationPending`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

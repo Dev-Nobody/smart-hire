@@ -13,7 +13,7 @@ export default function Login() {
   const onFinish = async (values) => {
     try {
       const response = await axios.post(
-        "http://localhost:3001/auth/signin",
+        `${process.env.NEXT_PUBLIC_BASE_URL}/auth/signin`,
         values
       );
 

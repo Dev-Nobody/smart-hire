@@ -20,7 +20,7 @@ export default function JobDetails() {
       }
 
       const response = await axios.post(
-        "http://localhost:3001/job-applications/apply",
+        `${process.env.NEXT_PUBLIC_BASE_URL}/job-applications/apply`,
         { jobId: +id },
         {
           headers: {
@@ -47,7 +47,7 @@ export default function JobDetails() {
         }
 
         const response = await axios.get(
-          `http://localhost:3001/job-applications/appliedCheck/${id}`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/job-applications/appliedCheck/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -71,7 +71,7 @@ export default function JobDetails() {
         }
 
         const response = await axios.get(
-          `http://localhost:3001/job-management/search/${id}`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/job-management/search/${id}`
         );
         console.log("Job Details:", response.data);
         setJobDetails(response.data);
